@@ -1,0 +1,543 @@
+1. // construction. can create a linkedlist class if tail is needed otherwise node is enough.
+    public static class Node {
+        int data = 0;
+        Node next = null;
+
+        Node(int data) {
+            this.data = data;
+        }
+    }
+
+    public static class LinkedList {
+        Node head = null;
+        Node tail = null;
+        int size = 0;
+    }
+    
+ 2. // display and display recursive.
+    public static void display(Node head){
+        Node temp = head;
+        while(temp!= null){
+            System.out.print(temp.data+"->");
+            temp=temp.next;
+        }
+        System.out.println();
+    }
+
+    public static void displayRec(Node head){
+        if(head==null){
+            return;
+        }
+        System.out.print(head.data+"->");
+        displayRec(head.next);
+    }
+    
+3. // addFirst/last & removeFirst/last are important and can solve almost any problem.
+    public static Node addFirst(Node head, int data){
+        Node temp = new Node(data);
+        if(head==null){
+            head = temp;
+            return head;
+        }
+        temp.next=head;
+        head=temp;
+        return head;
+    }
+
+    public static Node addLast(Node head, int data){
+        Node node = new Node(data);
+        Node temp = head;
+        if(head==null){
+            return node;
+        }
+        while(temp.next!=null){
+            temp=temp.next;
+        }
+        temp.next = node;
+        return head;
+    }
+
+    public static Node removeFirst(Node head){
+        if(head==null)
+            return null;
+        head = head.next;
+        return head;
+    }
+
+    public static Node removeLast(Node head){
+        if(head==null || head.next == null)
+            return null;
+        Node temp = head;
+        while(temp.next.next!=null){
+            temp=temp.next;
+        }
+        temp.next = null;
+        return head;
+    }
+    
+4. // create a new LL head. now addFirst for k times. (this reverses k node) then add this linked list to another linked list and do addLast.
+    public static Node Kreverse(Node head, int k){
+        Node temp = head;
+
+        Node finalList = null;
+        Node Ntail = null;
+        Node Otail = null;
+        while(temp!=null) {
+            Node revList = null;
+            int i;
+            for (i = 1; i <= k && temp!=null; i++) {
+                revList = addFirst(revList, temp.data);
+                if(i==1){
+                    Ntail = revList;
+                }
+                temp = removeFirst(temp);
+            }
+            if(i>k){
+                if(finalList==null){
+                    finalList = revList;
+                }
+                else{
+                    Otail.next = revList;
+                }
+            }
+            else{
+                Otail.next = head;
+                break;
+            }
+            Otail = Ntail;
+            head = temp;
+        }
+        return finalList;
+    }
+5. // do addFirst and removeFirst (this is the optimal way so that we dont have to traverse to remove tail)
+    public static class LLtoStack{
+        static LinkedList LL;
+        public LLtoStack(){
+            LL = new LinkedList();
+        }
+        public static void push(int x){
+            LL.head = addFirst(LL.head,x);
+        }
+        public static void pop(){
+            LL.head = removeFirst(LL.head);
+        }
+        public static int top(){
+            if(LL.head==null){
+                return -1;
+            }
+            return LL.head.data;
+        }
+    }
+6. // add to front and remove from end is push efficient. but better is to keep a tail and add last, remove front. its efficient either way then.
+    public static class LLtoQueue{
+        static LinkedList LL;
+        public LLtoQueue(){
+            LL = new LinkedList();
+        }
+        public static void push(int x){
+            LL.head = addFirst(LL.head,x);
+        }
+        public static void pop(){
+            LL.head = removeLast(LL.head);
+        }
+        public static int top(){
+            if(LL.head==null){
+                return -1;
+            }
+            return LL.head.data;
+        }
+    }
+7. //use slow fast pointer. make fast ptr to move k steps. then move them simultaneously.
+    public static Node KfromEnd(Node head, int k){
+        Node temp = head;
+        while(k-->0){
+            temp = temp.next;
+        }
+        Node ans = head;
+        while(temp!=null){
+            temp= temp.next;
+            ans = ans.next;
+        }
+        return ans;
+    }
+8. // slow fast ptr.
+    public static Node mid(Node head){
+        Node fast = head.next;
+        Node slow = head;
+        while(fast!=null && fast.next!=null){
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+9. // can do addFirst and removeLast but also can do dummy node concept. just keep on pointing the next to the smaller node of two and move it forward. 
+    public static Node Merge2LL(Node h1, Node h2){
+        Node ans = new Node(-1);
+        Node temp = ans;
+        Node t1 = h1;
+        Node t2 = h2;
+        while(t1!=null && t2!=null){
+            if(t1.data<t2.data){
+                temp.next = t1;
+                temp = temp.next;
+                t1 = t1.next;
+            }
+            else{
+                temp.next = t2;
+                temp = temp.next;
+                t2 = t2.next;
+            }
+        }
+        if(t1!=null){
+            temp.next = t1;
+        }
+        if(t2!=null){
+            temp.next = t2;
+        }
+        return ans.next;
+    }
+10. // same as merge sort.
+    public static Node mergeSort(Node head){
+        if(head.next==null){
+            return head;
+        }
+        Node midNode = mid(head);
+        Node h1 = head;
+        Node h2 = midNode.next;
+        midNode.next = null;
+        h1 = mergeSort(h1);
+        h2 = mergeSort(h2);
+        return Merge2LL(h1,h2);
+    }
+11. merging using divide and conquer
+    public static Node mergeKLL(Node[] list, int si, int ei){
+        if(si==ei){
+            return list[si];
+        }
+        int mid = (si+ei)/2;
+        Node h1 = mergeKLL(list, si, mid);
+        Node h2 = mergeKLL(list, mid+1, ei);
+        return Merge2LL(h1,h2);
+    }
+12. merging using priorityQueue
+    public static Node mergeKLLwithPQ(Node[] list){
+        PriorityQueue<Node> pq = new PriorityQueue<com.company.Main.Node>((a,b)->(a.data-b.data));
+        for(int i=0;i<list.length;i++){
+            pq.add(list[i]);
+        }
+        Node dummy = new Node(-1);
+        Node temp = dummy;
+        while(pq.size()>0){
+            Node n = pq.poll();
+            temp.next = n;
+            temp=temp.next;
+            if(n.next!=null)
+            pq.add(n.next);
+        }
+        return dummy.next;
+    }
+
+    public static void removeDuplicates(Node head){
+        Node temp = head;
+        while(temp.next!=null){
+            if(temp.next.data==temp.data){
+                temp.next = temp.next.next;
+            }
+            else{
+                temp=temp.next;
+            }
+        }
+    }
+13. // simple add/removes
+    public static Node addAtIdx(Node head, int i, int k){
+        Node n = new Node(k);
+        if(i==0){
+            n.next=head;
+            return n;
+        }
+        Node temp = head;
+        while(--i>0){
+            temp =temp.next;
+        }
+        n.next = temp.next;
+        temp.next = n;
+        return head;
+    }
+
+    public static Node removeAtIdx(Node head, int i){
+        if(i==0){
+            return head.next;
+        }
+        Node temp = head;
+        while(--i>0){
+            temp =temp.next;
+        }
+        temp.next=temp.next.next;
+        return head;
+    }
+
+    public static int getValueAt(Node head, int i){
+        Node temp = head;
+        while(i-->0){
+            temp =temp.next;
+        }
+        return temp.data;
+    }
+14. // create 2 dummy nodes for odd and even and make an even list and an odd list, then concatenate them.
+    public static Node oddEven(Node head){
+        Node odd = new Node(-1);
+        Node oddh = odd;
+        Node even = new Node(-1);
+        Node evenh = even;
+        Node curr = head;
+        while(curr!=null){
+            if(curr.data%2==0){
+                even.next=curr;
+                even=even.next;
+            }
+            else{
+                odd.next=curr;
+                odd = odd.next;
+            }
+            curr=curr.next;
+        }
+        if(odd==null){
+            return even;
+        }
+        if(even==null){
+            return odd;
+        }
+        odd.next = evenh.next;
+        even.next = null;
+        return oddh.next;
+    }
+15. // same as above
+    public static Node seg012(Node head){
+        Node z = new Node(-1); Node zh = z;
+        Node o = new Node(-1); Node oh = o;
+        Node t = new Node(-1); Node th = t;
+
+        Node temp = head;
+        while(temp!=null){
+            if(temp.data==0){
+                z.next = temp;
+                z=z.next;
+            }
+            else if(temp.data==1){
+                o.next = temp;
+                o=o.next;
+            }
+            else{
+                t.next = temp;
+                t=t.next;
+            }
+            temp=temp.next;
+        }
+
+        if(oh.next!=null){
+            z.next = oh.next;
+        }else{
+            z.next = th.next;
+        }
+        o.next = th.next;
+        t.next = null;
+        return zh.next;
+    }
+16. // quick sort
+    public static Node getTail(Node head){
+        Node temp = head;
+        while(temp.next!=null){
+            temp= temp.next;
+        }
+        return temp;
+    }
+
+    public static Node[] pivot(Node head){
+        Node tail = getTail(head);
+        Node temp = head;
+        Node small = new Node(-1); Node smallHead = small;
+        Node greater = new Node(-1); Node greaterHead = greater;
+        while(temp!=tail){
+            if(temp.data<tail.data){
+                small.next = temp;
+                small=small.next;
+            }
+            else{
+                greater.next = temp;
+                greater=greater.next;
+            }
+            temp=temp.next;
+        }
+        small.next = null;
+        greater.next = null;
+        return new Node[]{smallHead.next,tail,greaterHead.next};
+    }
+
+    public static Node[] quickSort(Node head){
+        if(head==null || head.next==null){
+            return new Node[]{head,head};
+        }
+        Node[] sort = pivot(head);
+        Node h1 = sort[0];
+        Node h2 = sort[2];
+        Node pivot = sort[1];
+
+        Node[] left = quickSort(h1);
+        Node[] right = quickSort(h2);
+
+        if(right[0]==null){
+            left[1].next=pivot;
+            return new Node[]{left[0],pivot};
+        }
+        else if(left[0]==null){
+            pivot.next =right[0];
+            return new Node[]{pivot,right[1]};
+        }
+        else{
+            left[1].next=pivot;
+            pivot.next =right[0];
+            return new Node[]{left[0],right[1]};
+        }
+    }
+17. // reverse data (iterative is poor complexity in this)
+    public static Node reverseItrData(Node head, int size){
+        Node curr = head;
+        for(int i=0;i<size/2;i++){
+            Node end = KfromEnd(head, i);
+            int temp = curr.data;
+            curr.data = end.data;
+            end.data=temp;
+            curr = curr.next;
+        }
+        return head;
+    }
+18. // reverse pointer 
+    public static Node reverseItrPointer(Node head){
+        Node prev = null;
+        Node curr = head;
+        Node nex = head;
+
+        while(curr!=null){
+            nex = nex.next;
+            curr.next=prev;
+            prev = curr;
+            curr = nex;
+        }
+        return prev;
+    }
+19. // recursive data swap. need global variable. and need to stop after mid
+    static Node start;
+    public static Node reverseRecData(Node head){
+        if(head==null){
+            return null;
+        }
+        reverseRecData(head.next);
+        if(start == null || head == start || head.next == start){
+            start = null;
+            return head;
+        }
+        int temp = start.data;
+        start.data = head.data;
+        head.data=temp;
+
+        start = start.next;
+        return head;
+    }
+20. // recursive pointer reverse. best.
+    static Node newHead;
+    public static Node reverseRecPointer(Node head){
+        if(head.next == null){
+            newHead = head;
+            return head;
+        }
+        Node temp = reverseRecPointer(head.next);
+        temp.next = head;
+        return temp;
+    }
+21. // reverse ll using add first remove first.
+    public static Node addFirst(Node head, Node add){
+        add.next = head;
+        return add;
+    }
+
+    public static Node reverseAddFirst(Node head){
+        Node curr = head;
+        Node ans = null;
+        while(curr!=null){
+            Node curr1 = curr;
+            curr=curr.next;
+            ans = addFirst(ans,curr1);
+        }
+        return ans;
+    }
+22. // require a global var
+    static Node start;
+    public static boolean isPalindromeRec(Node head){
+        if(head==null){
+            return true;
+        }
+        boolean b = isPalindromeRec(head.next);
+        if(!b){
+            return false;
+        }
+        b = start.data==head.data;
+        start = start.next;
+        return b;
+    }
+23. // reverse after mid, then iterate and compare.
+    public static boolean isPalindromeItr(Node head){
+        Node mid = mid(head);
+        Node newHead = mid.next;
+        mid.next = null;
+        newHead = reverseItrPointer(newHead);
+        Node curr1 = head;
+        Node curr2 = newHead;
+        while(curr2!=null){
+            if(curr2.data!=curr1.data){
+                return false;
+            }
+        }
+        return true;
+    }
+24. // divide LL in 2 from mid, then iterate and make new LL
+    public static Node foldLL(Node head){
+        Node mid = mid(head);
+        Node newHead = mid.next;
+        mid.next = null;
+        newHead = reverseItrPointer(newHead);
+        Node curr1 = head;
+        Node curr2 = newHead;
+        while(curr2!=null){
+            Node temp = curr2.next;
+            curr2.next=curr1.next;
+            curr1.next=curr1.next.next;
+            curr1=curr1.next.next;
+            curr2 = temp;
+        }
+        return head;
+    }
+    
+25. // unfold LL.
+
+26. // make dummy node after every node.
+    public static Node copyLL(Node head){
+        Node temp = head;
+        while(temp!=null){
+            Node node = new Node(temp.data);
+            node.next=temp.next;
+            temp.next=node;
+            temp=temp.next.next;
+        }
+        temp = head;
+        Node ans = null;
+        while(temp!=null){
+            if(ans == null){
+                ans = temp.next;
+            }else{
+                ans.next = temp.next;
+            }
+            temp.next = temp.next.next;
+            temp=temp.next;
+        }
+        return ans;
+    }
